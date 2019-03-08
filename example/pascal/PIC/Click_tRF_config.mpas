@@ -1,0 +1,8 @@
+unit Click_tRF_config;
+
+uses Click_tRF_types;
+
+const
+    _TRF_UART_CFG : array[1] of uint32_t = (19200); 
+    
+end.

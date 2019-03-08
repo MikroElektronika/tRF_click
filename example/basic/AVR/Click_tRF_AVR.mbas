@@ -1,0 +1,67 @@
+'
+'Example for tRF Click
+'
+'    Date          : apr 2018.
+'    Author        : Katarina Perendic
+'
+'Test configuration AVR :
+'    
+'    MCU              : ATMEGA32
+'    Dev. Board       : EasyAVR v7 
+'    AVR Compiler ver : v7.0.1.0
+'
+'---
+'Description :
+'
+'The application is composed of three sections :
+'
+'- System Initialization - Intializes UART module
+'- Application Initialization - Driver intialization
+'- Application Task - (code snippet) - Checks if new data byte have received in rx buffer (ready for reading),
+'  and if ready than reads one byte from rx buffer. In second case aplication task writes
+'  message data via UART.
+'
+'
+program Click_tRF_AVR
+
+include Click_tRF_types
+include Click_tRF_config
+
+const
+    MESSAGE_DATA as uint8_t[9] = ("M", "i", "k", "r", "o", "E", 13, 10, 0)
+    
+sub procedure systemInit() 
+
+    mikrobus_uartInit(_MIKROBUS1, @_TRF_UART_CFG[0]) 
+    Delay_ms(100) 
+
+end sub
+
+sub procedure applicationInit() 
+
+    trf_uartDriverInit(T_TRF_P(@_MIKROBUS1_GPIO), T_TRF_P(@_MIKROBUS1_UART)) 
+    Delay_ms(100) 
+
+end sub
+
+sub procedure applicationTask() 
+dim
+    tmp as char
+    rdyFlag as uint8_t
+
+    for tmp = 0 to 9-1
+        trf_writeByte(MESSAGE_DATA[tmp]) 
+    next tmp
+    Delay_ms(2000) 
+
+end sub
+
+main :
+
+    systemInit() 
+    applicationInit() 
+    while (1) 
+        applicationTask() 
+    wend
+
+end.

@@ -1,0 +1,74 @@
+{*
+Example for tRF Click
+
+    Date          : apr 2018.
+    Author        : Katarina Perendic
+
+Test configuration PIC :
+    
+    MCU             : P18F87K22
+    Dev. Board      : EasyPIC PRO v7
+    PIC Compiler ver : v7.2.0.0
+
+---
+Description :
+
+The application is composed of three sections :
+
+- System Initialization - Intializes UART module
+- Application Initialization - Driver intialization
+- Application Task - (code snippet) - Checks if new data byte have received in rx buffer (ready for reading),
+  and if ready than reads one byte from rx buffer. In second case aplication task writes
+  message data via UART.
+
+*}
+program Click_tRF_PIC;
+
+uses Click_tRF_types, Click_tRF_config;
+
+const
+    MESSAGE_DATA : array[9] of uint8_t = ('M', 'i', 'k', 'r', 'o', 'E', 13, 10, 0); 
+    
+procedure systemInit(); 
+begin
+
+    mikrobus_uartInit(_MIKROBUS1, @_TRF_UART_CFG[0]); 
+    mikrobus_logInit(_MIKROBUS3, 19200); 
+    Delay_ms(100); 
+
+end;
+
+procedure applicationInit(); 
+begin
+
+    trf_uartDriverInit(T_TRF_P(@_MIKROBUS1_GPIO), T_TRF_P(@_MIKROBUS1_UART)); 
+    mikrobus_logWrite('Initialized', _LOG_LINE); 
+    Delay_ms(100); 
+
+end;
+
+procedure applicationTask(); 
+var
+    tmp : char;
+    rdyFlag : uint8_t;
+begin
+
+    rdyFlag := trf_byteReady(); 
+    if ((1 = rdyFlag)) then 
+    begin
+        tmp := trf_readByte(); 
+        mikrobus_logWrite(@tmp, _LOG_BYTE); 
+    end; 
+
+end;
+
+begin
+
+    systemInit(); 
+    applicationInit(); 
+    while (1) do 
+    begin 
+        applicationTask(); 
+    end;
+
+end.

@@ -1,0 +1,8 @@
+module Click_tRF_config
+
+include Click_tRF_types
+
+const
+    _TRF_UART_CFG as uint32_t[1] = (19200)
+    
+end.
